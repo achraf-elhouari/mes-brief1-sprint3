@@ -1,21 +1,32 @@
 const API_URL = "https://countries.dev/countries";
 
 // Tous les pays reçus de l'API (rempli une seule fois, au chargement)
-let allCountries = [];
 
-// TODO : récupère ici les éléments du DOM dont tu as besoin
+const countrySection = document.querySelector('#country-list');
 
 /**
  * Récupère tous les pays depuis l'API.
  * - Utilise fetch avec async/await.
  * - Appelée UNE SEULE FOIS, au chargement de la page.
- *
- * @returns {Promise<Array>} Le tableau de tous les pays.
- */
+*
+* @returns {Promise<Array>} Le tableau de tous les pays.
+*/
 async function fetchCountries() {
-  // TODO
+  try {
+    const response = await fetch('https://countries.dev/countries');
+    if (!response.ok)
+      throw new Error('Erreur' + response.status);
+    const data = await response.json();
+    return data;
+  }
+  catch (error){
+    console.error('Erreur : ' + error.message);
+  }
 }
+const data = await fetchCountries();
 
+let allCountries = [...data];
+console.log(allCountries);
 /**
  * Crée la carte HTML d'un pays, sur le modèle de la maquette :
  * drapeau (avec un texte alternatif utile), nom, capitale, population.
@@ -24,7 +35,45 @@ async function fetchCountries() {
  * @returns {HTMLElement} La carte, prête à être ajoutée à la grille.
  */
 function createCountryCard(country) {
-  // TODO
+  const article = document.createElement('article');
+  const image = document.createElement('img');
+  image.src = 'https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_the_Taliban.svg';
+  image.alt = `${country.name}'s flag`;
+  image.className = "w-fit rounded-2xl";
+
+  article.append(image);
+
+  const countryTitle = document.createElement('h2');
+  countryTitle.textContent = country.name;
+  countryTitle.className = "text-2xl font-bold";
+
+  article.append(countryTitle);
+
+  const div1 = document.createElement('div');
+  const capitaleP = document.createElement('p');
+  const capitaleName = document.createElement('p');
+  capitaleP.textContent = 'Capitale';
+  capitaleName.textContent = country.capital;
+  div1.className = "flex justify-between items-center";
+
+  div1.append(capitaleP, capitaleName);
+
+  const div2 = document.createElement('div');
+  const populationP = document.createElement('p');
+  const populationNum = document.createElement('p');
+  populationP.textContent = 'Population';
+  populationNum.textContent = country.population;
+  div2.className = "flex justify-between items-center";
+
+  div2.append(populationP, populationNum);
+
+  article.append(div1, div2);
+  article.className = 'border-2 rounded-2xl p-4 grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2';
+  return article;
+}
+
+function fetch_region(){
+  
 }
 
 /**
@@ -36,8 +85,12 @@ function createCountryCard(country) {
  * @param {Array} countries - Les pays à afficher.
  */
 function displayCountries(countries) {
-  // TODO
+  countrySection.textContent = "";
+  for (let i = 0; i < 10; i++){
+    countrySection.append(createCountryCard(allCountries[i]));
+  }
 }
+displayCountries(allCountries);
 
 /**
  * Applique les deux filtres EN MÊME TEMPS sur allCountries :
